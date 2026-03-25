@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Login | FF Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #ffaa00; --bg: #0f172a; --card: #1e293b; --text: #fff; --input: #334155; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); }
+        .login-box { background: var(--card); padding: 35px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 40px rgba(0,0,0,0.4); animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .logo { font-size: 45px; color: var(--primary); margin-bottom: 10px; }
+        .title { font-size: 20px; font-weight: 600; margin-bottom: 25px; letter-spacing: 0.5px; }
+        .input-wrap { margin-bottom: 18px; text-align: left; }
+        .input-wrap label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
+        .input-wrap input { width: 100%; padding: 12px 14px; background: var(--input); border: 2px solid transparent; border-radius: 8px; color: #fff; font-size: 14px; outline: none; transition: 0.3s; }
+        .input-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,170,0,0.15); }
+        .btn-primary { width: 100%; padding: 13px; background: linear-gradient(135deg, #ffaa00, #ff8800); border: none; border-radius: 8px; color: #000; font-weight: 600; font-size: 15px; cursor: pointer; transition: 0.2s; margin-bottom: 15px; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover { box-shadow: 0 5px 20px rgba(255,170,0,0.3); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        .divider { margin: 20px 0; position: relative; }
+        .divider::before { content:''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: #334155; }
+        .divider span { background: var(--card); padding: 0 12px; position: relative; color: #94a3b8; font-size: 11px; }
+        .btn-google { width: 100%; padding: 12px; background: #fff; color: #333; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
+        .btn-google:hover { background: #f1f1f1; }
+        .msg { margin-top: 15px; font-size: 13px; min-height: 20px; }
+        .msg.error { color: #ff6b6b; }
+        .msg.success { color: #51cf66; }
+        .loader { display: none; width: 18px; height: 18px; border: 2px solid #000; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .secure-note { position: fixed; bottom: 15px; right: 15px; font-size: 10px; color: #4ade80; display: flex; align-items: center; gap: 4px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <div class="logo"><i class="fas fa-shield-alt"></i></div>
+    <div class="title">SECURE ACCESS</div>
+    
+    <form id="loginForm">
+        <div class="input-wrap">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="input-wrap">
+            <label>Password</label>            <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary" id="loginBtn">
+            <span id="btnText">LOGIN</span>
+            <div class="loader" id="btnLoader"></div>
+        </button>
+    </form>
+    
+    <div class="msg" id="message"></div>
+    
+    <div class="divider"><span>OR</span></div>
+    
+    <button class="btn-google" id="googleBtn">
+        <i class="fab fa-google"></i> Continue with Google
+    </button>
+</div>
+
+<div class="secure-note"><i class="fas fa-lock"></i> 256-bit Encrypted</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 🔥🔥🔥 APNI FIREBASE CONFIG YAHA PASTE KAR 🔥🔥🔥
+    const firebaseConfig = {
+    apiKey: "AIzaSyC1tXvanDZ-NsMksSgYemHbXALeckncA3M",
+    authDomain: "ff-player-99533.firebaseapp.com",
+    databaseURL: "https://ff-player-99533-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ff-player-99533",
+    storageBucket: "ff-player-99533.firebasestorage.app",
+    messagingSenderId: "204761167233",
+    appId: "1:204761167233:web:bd33032ce7d56b4e7fe480"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    const msgBox = document.getElementById('message');
+    const googleBtn = document.getElementById('googleBtn');
+
+    // Check if already logged in
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            window.location.href = "deshiiboard.html";        }
+    });
+
+    // Email Login
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
+            // Redirect handled by onAuthStateChanged
+        } catch (error) {
+            showMessage(error.message, "error");
+            setLoading(false);
+        }
+    });
+
+    // Google Login (Fixed)
+    googleBtn.addEventListener('click', async () => {
+        setLoading(true);
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            // Save user data if new
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                await setDoc(userRef, { email: user.email, name: user.displayName, createdAt: new Date() });
+            }
+            // Redirect handled by onAuthStateChanged
+        } catch (error) {
+            showMessage(error.message, "error");
+            setLoading(false);
+        }
+    });
+
+    function setLoading(load) {
+        btnText.style.display = load ? 'none' : 'block';
+        btnLoader.style.display = load ? 'block' : 'none';
+        loginBtn.disabled = load;
+        googleBtn.disabled = load;
+    }
+    function showMessage(txt, type) {
+        msgBox.textContent = txt;
+        msgBox.className = `msg ${type}`;
+    }
+    
+    // Security
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</body></html>

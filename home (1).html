@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Player - Profile Setup</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { color: white; font-size: 22px; font-weight: 600; }
+        .save-btn { background: #4CAF50; color: white; border: none; padding: 10px 25px; border-radius: 25px; font-size: 14px; font-weight: 600; cursor: pointer; opacity: 0.5; pointer-events: none; transition: 0.3s; }
+        .save-btn.active { opacity: 1; pointer-events: all; }
+        .save-btn.active:hover { background: #45a049; transform: translateY(-2px); }
+        .profile-section { padding: 30px 20px; text-align: center; background: #f8f9fa; }
+        .photo-container { position: relative; display: inline-block; cursor: pointer; }
+        .profile-photo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 5px solid white; box-shadow: 0 5px 20px rgba(0,0,0,0.2); background: #ddd; }
+        .edit-icon { position: absolute; bottom: 5px; right: 5px; background: #667eea; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
+        .form-section { padding: 30px 20px; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; transition: 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .error-message { color: #f44336; font-size: 12px; margin-top: 5px; display: none; }
+        .error-message.show { display: block; }
+        .success-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .success-overlay.show { display: flex; }
+        .success-box { background: white; padding: 40px; border-radius: 20px; text-align: center; }
+        .success-icon { width: 80px; height: 80px; background: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 40px; }
+        .loading { text-align: center; display: none; margin: 20px 0; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Complete Profile</h2>
+            <button class="save-btn" id="saveBtn">Save</button>
+        </div>
+        <div class="profile-section">
+            <div class="photo-container" id="photoContainer">
+                <img src="https://via.placeholder.com/120" alt="Profile" class="profile-photo" id="profilePhoto">
+                <div class="edit-icon">🖊️</div>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">Tap to upload photo (Optional)</p>
+            <input type="file" id="photoInput" accept="image/*" style="display: none;">
+        </div>        <div class="form-section">
+            <div class="form-group">
+                <label>Name <span style="color: #f44336;">*</span></label>
+                <input type="text" id="name" placeholder="Enter your full name" maxlength="50">
+                <div class="error-message" id="nameError">Please enter your name</div>
+            </div>
+            <div class="form-group">
+                <label>Nickname <span style="color: #f44336;">*</span></label>
+                <input type="text" id="nickname" placeholder="Enter your nickname" maxlength="30">
+                <div class="error-message" id="nicknameError">Please enter your nickname</div>
+            </div>
+            <div class="form-group">
+                <label>Free Fire UID <span style="color: #f44336;">*</span></label>
+                <input type="tel" id="ffuid" placeholder="Enter 10 digit UID" maxlength="10">
+                <div class="error-message" id="ffuidError">Please enter valid 10 digit UID</div>
+            </div>
+            <div class="form-group">
+                <label>Bio <span style="color: #999;">(Optional)</span></label>
+                <textarea id="bio" placeholder="Tell us about yourself..." maxlength="200"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Link <span style="color: #999;">(Optional)</span></label>
+                <input type="url" id="link" placeholder="YouTube/Instagram link">
+            </div>
+        </div>
+    </div>
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-box">
+            <div class="success-icon">✓</div>
+            <h3>Profile Saved!</h3>
+            <p>Redirecting...</p>
+        </div>
+    </div>
+    <div class="loading" id="loading"><div class="spinner"></div></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1tXvanDZ-NsMksSgYemHbXALeckncA3M",
+            authDomain: "ff-player-99533.firebaseapp.com",
+            databaseURL: "https://ff-player-99533-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-player-99533",
+            storageBucket: "ff-player-99533.firebasestorage.app",
+            messagingSenderId: "204761167233",
+            appId: "1:204761167233:web:bd33032ce7d56b4e7fe480"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Auto check: If not logged in, redirect to login
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'signup.html';
+            } else {
+                // Check if profile already exists
+                const profileSnap = await get(ref(db, 'profiles/' + user.uid));
+                if (profileSnap.exists()) {
+                    window.location.href = 'mainn.html';
+                }
+            }
+        });
+
+        const saveBtn = document.getElementById('saveBtn');
+        const photoContainer = document.getElementById('photoContainer');
+        const photoInput = document.getElementById('photoInput');
+        const profilePhoto = document.getElementById('profilePhoto');
+        const nameInput = document.getElementById('name');
+        const nicknameInput = document.getElementById('nickname');
+        const ffuidInput = document.getElementById('ffuid');
+        const bioInput = document.getElementById('bio');
+        const linkInput = document.getElementById('link');
+        const successOverlay = document.getElementById('successOverlay');
+
+        let selectedPhoto = null;
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => { if (user) currentUser = user; });
+
+        photoContainer.addEventListener('click', () => { photoInput.click(); });
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { profilePhoto.src = e.target.result; selectedPhoto = file; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        ffuidInput.addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); validateForm(); });
+        [nameInput, nicknameInput, ffuidInput, linkInput].forEach(input => {
+            input.addEventListener('input', validateForm);
+        });
+
+        function validateForm() {
+            const isNameValid = nameInput.value.trim().length > 0;            const isNicknameValid = nicknameInput.value.trim().length > 0;
+            const isFFUIDValid = ffuidInput.value.trim().length === 10;
+            if (isNameValid && isNicknameValid && isFFUIDValid) {
+                saveBtn.classList.add('active');
+            } else {
+                saveBtn.classList.remove('active');
+            }
+        }
+
+        saveBtn.addEventListener('click', async () => {
+            if (!saveBtn.classList.contains('active')) return;
+            if (!currentUser) return;
+
+            saveBtn.textContent = 'Saving...';
+            try {
+                const profileData = {
+                    uid: currentUser.uid,
+                    name: nameInput.value.trim(),
+                    nickname: nicknameInput.value.trim(),
+                    ffuid: ffuidInput.value.trim(),
+                    bio: bioInput.value.trim(),
+                    link: linkInput.value.trim(),
+                    photoURL: selectedPhoto ? profilePhoto.src : (currentUser.photoURL || null),
+                    email: currentUser.email,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                };
+                await set(ref(db, 'profiles/' + currentUser.uid), profileData);
+                successOverlay.classList.add('show');
+                setTimeout(() => { window.location.href = 'mainn.html'; }, 1500);
+            } catch (err) {
+                alert('Error saving profile. Please try again.');
+                saveBtn.textContent = 'Save';
+            }
+        });
+    </script>
+</body>
+</html>

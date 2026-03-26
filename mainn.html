@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-sport - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding-bottom: 80px;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-initial {
+            width: 45px;
+            height: 45px;
+            background: #ffffff;
+            color: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .app-name {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .header-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Choose Game Section */
+        .choose-game-header {
+            padding: 25px 20px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .choose-game-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .future-space {
+            width: 100px;
+        }
+
+        /* Game Grid */        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 0 15px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+
+        .game-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-name {
+            padding: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .coming-soon {
+            color: #ffd700;
+            font-style: italic;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            margin: 0 5px;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            color: #ffffff;
+        }
+
+        .nav-icon-empty {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .app-name {                font-size: 18px;
+            }
+            
+            .choose-game-title {
+                font-size: 20px;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: 18px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div id="appContent" style="display: none;">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="user-initial" id="userInitial">?</div>
+                <div class="app-name">E-sport</div>
+            </div>
+            <div class="header-right">
+                <div class="header-icon" id="searchBtn">🔍</div>
+                <div class="header-icon" id="notificationBtn">🔔</div>
+                <div class="header-icon" id="menuBtn">⋮</div>
+            </div>
+        </div>
+
+        <!-- Choose Game Section -->
+        <div class="choose-game-header">
+            <div class="choose-game-title">Choose your game</div>
+            <div class="future-space"></div>
+        </div>
+
+        <!-- Game Grid -->
+        <div class="game-grid" id="gameGrid">
+            <!-- Games will be loaded here dynamically -->
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-redirect="home.html">
+                <div class="nav-icon">🏠</div>
+            </div>            <div class="nav-item" data-redirect="search.html">
+                <div class="nav-icon">🔍</div>
+            </div>
+            <div class="nav-item" data-redirect="gun.html">
+                <div class="nav-icon-empty" id="gunIcon">Add JPG</div>
+            </div>
+            <div class="nav-item" data-redirect="paper.html">
+                <div class="nav-icon">📜</div>
+            </div>
+            <div class="nav-item" data-redirect="profile.html">
+                <div class="nav-icon">👤</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">Loading...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1tXvanDZ-NsMksSgYemHbXALeckncA3M",
+            authDomain: "ff-player-99533.firebaseapp.com",
+            databaseURL: "https://ff-player-99533-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-player-99533",
+            storageBucket: "ff-player-99533.firebasestorage.app",
+            messagingSenderId: "204761167233",
+            appId: "1:204761167233:web:bd33032ce7d56b4e7fe480"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Game Configuration - Add/Edit games here
+        const games = [
+            {
+                name: "Free Fire",
+                image: "freefire.jpg",  // Replace with your JPG file
+                redirect: "freefire.html"  // Create this page later
+            },
+            {
+                name: "BGMI",
+                image: "bgmi.jpg",  // Replace with your JPG file
+                redirect: "bgmi.html"  // Create this page later
+            },            {
+                name: "Mini Militia",
+                image: "minimilitia.jpg",  // Replace with your JPG file
+                redirect: "minimilitia.html"  // Create this page later
+            },
+            {
+                name: "Coming Soon",
+                image: null,
+                redirect: null,
+                comingSoon: true
+            },
+            {
+                name: "Coming Soon",
+                image: null,
+                redirect: null,
+                comingSoon: true
+            },
+            {
+                name: "Coming Soon",
+                image: null,
+                redirect: null,
+                comingSoon: true
+            }
+        ];
+
+        // Bottom Navigation Configuration
+        const bottomNavItems = [
+            { redirect: "home.html" },
+            { redirect: "search.html" },
+            { redirect: "gun.html" },
+            { redirect: "paper.html" },
+            { redirect: "profile.html" }
+        ];
+
+        // Check Authentication and Load Profile
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // Fetch user profile from database
+                    const profileSnap = await get(ref(db, 'profiles/' + user.uid));
+                    
+                    if (profileSnap.exists()) {
+                        const profileData = profileSnap.val();
+                        // Set user initial
+                        const initial = profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U';
+                        document.getElementById('userInitial').textContent = initial;
+                    } else {
+                        // If no profile, use email initial
+                        const initial = user.email ? user.email.charAt(0).toUpperCase() : 'U';
+                        document.getElementById('userInitial').textContent = initial;                    }
+                    
+                    // Show content and hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('appContent').style.display = 'block';
+                    
+                    // Load games
+                    loadGames();
+                    
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                    document.getElementById('loading').textContent = 'Error loading data';
+                }
+            } else {
+                // Not logged in, redirect to login
+                window.location.href = 'signup.html';
+            }
+        });
+
+        // Load Games Grid
+        function loadGames() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.innerHTML = '';
+
+            games.forEach((game, index) => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card';
+                
+                if (game.comingSoon) {
+                    gameCard.innerHTML = `
+                        <div class="game-image" style="display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-size: 40px;">
+                            🎮
+                        </div>
+                        <div class="game-name coming-soon">${game.name}</div>
+                    `;
+                } else {
+                    // Use placeholder if image not available
+                    const imageUrl = game.image ? game.image : 'https://via.placeholder.com/300x200/667eea/ffffff?text=' + encodeURIComponent(game.name);
+                    
+                    gameCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${game.name}" class="game-image" onerror="this.src='https://via.placeholder.com/300x200/667eea/ffffff?text=${encodeURIComponent(game.name)}'">
+                        <div class="game-name">${game.name}</div>
+                    `;
+                    
+                    // Add click handler
+                    gameCard.addEventListener('click', () => {
+                        if (game.redirect) {
+                            window.location.href = game.redirect;
+                        }
+                    });                }
+                
+                gameGrid.appendChild(gameCard);
+            });
+        }
+
+        // Header Icons Click Handlers (Placeholder for future features)
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            window.location.href = 'search.html';
+        });
+
+        document.getElementById('notificationBtn').addEventListener('click', () => {
+            window.location.href = 'notifications.html';
+        });
+
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            window.location.href = 'menu.html';
+        });
+
+        // Bottom Navigation Click Handlers
+        document.querySelectorAll('.nav-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                const redirect = bottomNavItems[index].redirect;
+                if (redirect) {
+                    window.location.href = redirect;
+                }
+            });
+        });
+
+        // Note: For gun icon JPG image
+        // Replace the div with id="gunIcon" with your image:
+        // <img src="your-gun-image.jpg" class="nav-icon" style="width: 40px; height: 40px; object-fit: cover; border-radius: 10px;">
+    </script>
+</body>
+</html>

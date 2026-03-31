@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - FF Player</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            padding-bottom: 20px;
+            color: #ffffff;
+        }
+
+        /* Header */
+        .header-wrapper { position: relative; }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 20px; 
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .header-title { 
+            font-size: 26px; 
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .header-line { 
+            height: 3px; 
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+        }
+        
+        .back-btn { 
+            position: absolute; 
+            left: 20px; 
+            top: 50%; 
+            transform: translateY(-50%);
+            font-size: 24px; 
+            cursor: pointer; 
+            color: white;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Notifications Container */
+        .notifications-container { 
+            padding: 20px; 
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Notification Card */
+        .notification-card { 
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%); 
+            border-radius: 15px; 
+            padding: 20px; 
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            border-left: 4px solid #667eea;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-card.expiring-soon {
+            border-left-color: #f44336;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 5px 30px rgba(244,67,54,0.5); }
+        }
+
+        /* Timer Badge */
+        .timer-badge { 
+            position: absolute; 
+            top: 15px;             right: 15px; 
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(33,150,243,0.4);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .timer-badge.urgent { 
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Notification Content */
+        .notification-text { 
+            color: #e0e0e0; 
+            font-size: 16px; 
+            line-height: 1.7; 
+            margin-bottom: 15px;
+            padding-right: 120px;
+        }
+
+        /* Notification Image */
+        .notification-image { 
+            width: 100%; 
+            max-width: 300px; 
+            border-radius: 12px; 
+            margin: 15px 0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .notification-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* Notification Footer */
+        .notification-footer { 
+            display: flex;             justify-content: space-between; 
+            align-items: center; 
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #3d3d5c;
+        }
+
+        .notification-time { 
+            color: #999; 
+            font-size: 13px;
+        }
+
+        /* Empty State */
+        .empty-state { 
+            text-align: center; 
+            padding: 60px 20px; 
+            color: #666;
+        }
+        
+        .empty-icon { 
+            font-size: 80px; 
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-text { 
+            font-size: 18px; 
+            color: #999;
+        }
+
+        /* Send Button */
+        .send-btn {            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(76,175,80,0.4);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(76,175,80,0.6);
+        }
+
+        /* Zoom Modal */
+        .zoom-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.95); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 4000;
+            cursor: zoom-out;
+        }
+        
+        .zoom-modal.show { 
+            display: flex; 
+        }
+        
+        .zoom-image { 
+            max-width: 95%; 
+            max-height: 95%; 
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        
+        .zoom-close { 
+            position: absolute; 
+            top: 20px;             right: 30px; 
+            font-size: 40px; 
+            color: white; 
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-wrapper">
+        <div class="header">
+            <button class="back-btn" onclick="window.history.back()">←</button>
+            <div class="header-title">Notifications</div>
+            <div class="header-line"></div>
+        </div>
+    </div>
+
+    <!-- Notifications Container -->
+    <div class="notifications-container" id="notificationsContainer">
+        <!-- Notifications will be loaded here -->
+    </div>
+
+    <!-- Zoom Modal -->
+    <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
+        <span class="zoom-close">&times;</span>
+        <img src="" alt="Zoomed photo" class="zoom-image" id="zoomImage">
+    </div>
+
+    <script>
+        // Load notifications on page load
+        window.addEventListener('load', () => {
+            loadNotifications();
+            // Update timers every second
+            setInterval(updateTimers, 1000);
+        });
+
+        // Load all notifications
+        function loadNotifications() {            const container = document.getElementById('notificationsContainer');
+            let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+            
+            // Remove expired notifications
+            const now = Date.now();
+            notifications = notifications.filter(notif => notif.expiresAt > now);
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔔</div>
+                        <div class="empty-text">No notifications yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            // Sort by newest first
+            notifications.sort((a, b) => b.createdAt - a.createdAt);
+            
+            notifications.forEach((notif, index) => {
+                const notificationCard = createNotificationCard(notif, index);
+                container.appendChild(notificationCard);
+            });
+        }
+
+        // Create notification card
+        function createNotificationCard(notif, index) {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            card.id = `notif-${notif.id}`;
+
+            // Calculate remaining time
+            const remaining = Math.max(0, Math.floor((notif.expiresAt - Date.now()) / 1000));
+            
+            // Format time
+            const timeString = formatTime(remaining);
+            
+            // Check if expiring soon (less than 10 seconds)
+            if (remaining < 10) {
+                card.classList.add('expiring-soon');
+            }
+
+            // Format created time
+            const createdDate = new Date(notif.createdAt);
+            const formattedDate = createdDate.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Image HTML
+            let imageHTML = '';
+            if (notif.image) {
+                imageHTML = `<img src="${notif.image}" class="notification-image" onclick="openZoom('${notif.image}')" alt="Notification image">`;
+            }
+
+            // Timer badge class
+            const timerClass = remaining < 10 ? 'timer-badge urgent' : 'timer-badge';
+
+            card.innerHTML = `
+                <div class="${timerClass}" id="timer-${notif.id}">
+                    ⏱️ ${timeString}
+                </div>
+                <div class="notification-text">${escapeHtml(notif.text)}</div>
+                ${imageHTML}
+                <div class="notification-footer">
+                    <span class="notification-time">🕐 ${formattedDate}</span>
+                    <button class="delete-btn" onclick="deleteNotification(${notif.id})">🗑️ Delete</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Update all timers
+        function updateTimers() {
+            const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+            const now = Date.now();
+
+            notifications.forEach(notif => {
+                const timerElement = document.getElementById(`timer-${notif.id}`);
+                const cardElement = document.getElementById(`notif-${notif.id}`);
+                
+                if (timerElement && cardElement) {
+                    const remaining = Math.max(0, Math.floor((notif.expiresAt - now) / 1000));
+                    
+                    if (remaining === 0) {
+                        // Remove notification
+                        cardElement.remove();
+                    } else {
+                        // Update timer display
+                        timerElement.innerHTML = `⏱️ ${formatTime(remaining)}`;
+                        
+                        // Add urgent class if less than 10 seconds
+                        if (remaining < 10) {                            timerElement.classList.add('urgent');
+                            cardElement.classList.add('expiring-soon');
+                        }
+                    }
+                }
+            });
+
+            // Clean up expired notifications from storage
+            const activeNotifications = notifications.filter(notif => notif.expiresAt > now);
+            if (activeNotifications.length !== notifications.length) {
+                localStorage.setItem('notifications', JSON.stringify(activeNotifications));
+            }
+
+            // Check if all notifications are gone
+            if (activeNotifications.length === 0) {
+                document.getElementById('notificationsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔔</div>
+                        <div class="empty-text">No notifications yet</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Format time (seconds to HH:MM:SS or MM:SS or SS)
+        function formatTime(seconds) {
+            if (seconds < 60) {
+                return `${seconds}s`;
+            } else if (seconds < 3600) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}m ${secs}s`;
+            } else {
+                const hours = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                return `${hours}h ${mins}m ${secs}s`;
+            }
+        }
+
+        
+        // Open Zoom Modal
+        function openZoom(photoSrc) {
+            document.getElementById('zoomImage').src = photoSrc;
+            document.getElementById('zoomModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Zoom Modal
+        function closeZoom() {
+            document.getElementById('zoomModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Sport Battle - FF Player</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CSS STYLING --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: white;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header .preview {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+
+        .header-menu {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: white;            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar {
+            flex: 1;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-bar i {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .bell-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .bell-icon i {
+            color: #fbbc05;
+            font-size: 18px;
+        }
+
+        .bell-icon .notification-dot {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            background: #ff4757;
+            border-radius: 50%;
+        }
+
+        /* VS Section */
+        .vs-section {
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .vs-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 2px solid #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .score-input {
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        .score-input:focus {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .vs-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4757;
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+        }
+
+        .add-battle-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .add-battle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .add-battle-btn i {
+            font-size: 28px;
+            color: white;
+        }
+
+        /* Battle List Section */
+        .battle-list {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .battle-card {
+            background: #2a2a4a;
+            border-radius: 15px;
+            padding: 20px;            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #3a3a5a;
+        }
+
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .team-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .battle-score {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff4757;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #16213e;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #333;
+            z-index: 1000;
+        }
+        .nav-item {
+            color: #888;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+        }
+
+        /* Modal for New Battle */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #2a2a4a;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;            background: #1a1a2e;
+            border: 1px solid #3a3a5a;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .modal-content input:focus {
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-btn.cancel {
+            background: #444;
+            color: white;
+        }
+
+        .modal-btn.create {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>E-Sport Battle - FF Player</h1>
+        <div class="preview">Preview</div>
+        <div class="header-menu">
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
+    </div>
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search creators">
+        </div>
+        <div class="bell-icon">
+            <i class="fas fa-bell"></i>
+            <div class="notification-dot"></div>
+        </div>
+    </div>
+
+    <!-- VS Section -->
+    <div class="vs-section">
+        <div class="vs-box">
+            <input type="text" class="score-input" id="score1" value="00" maxlength="2">
+            <span class="vs-text">VS</span>
+            <input type="text" class="score-input" id="score2" value="00" maxlength="2">
+        </div>
+        <div class="add-battle-btn" onclick="openModal()">
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+
+    <!-- Battle List -->
+    <div class="battle-list">
+        <h2 class="section-title">Active Battles</h2>
+        <div id="battleCards">
+            <!-- Battle cards will be added here -->
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="navigate('home.html')">
+            <i class="fas fa-home"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('search.html')">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="nav-item active" onclick="navigate('battle.html')">
+            <i class="fas fa-crosshairs"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('tournament.html')">
+            <i class="fas fa-scroll"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('profile.html')">
+            <i class="fas fa-user"></i>
+        </div>
+    </div>
+    <!-- New Battle Modal -->
+    <div class="modal" id="battleModal">
+        <div class="modal-content">
+            <h2>Create New Battle</h2>
+            <input type="text" id="team1Name" placeholder="Team 1 Name">
+            <input type="text" id="team2Name" placeholder="Team 2 Name">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn create" onclick="createBattle()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- --- JAVASCRIPT LOGIC --- -->
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js";
+
+        // 🔥 Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1tXvanDZ-NsMksSgYemHbXALeckncA3M",
+            authDomain: "ff-player-99533.firebaseapp.com",
+            databaseURL: "https://ff-player-99533-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-player-99533",
+            storageBucket: "ff-player-99533.firebasestorage.app",
+            messagingSenderId: "204761167233",
+            appId: "1:204761167233:web:bd33032ce7d56b4e7fe480"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Score Input Validation (Only 2 digits)
+        const score1Input = document.getElementById('score1');
+        const score2Input = document.getElementById('score2');
+
+        score1Input.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2);
+            if (this.value.length === 1) {
+                this.value = '0' + this.value;
+            }
+        });
+
+        score2Input.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2);
+            if (this.value.length === 1) {
+                this.value = '0' + this.value;            }
+        });
+
+        // Modal Functions
+        window.openModal = function() {
+            document.getElementById('battleModal').style.display = 'flex';
+        }
+
+        window.closeModal = function() {
+            document.getElementById('battleModal').style.display = 'none';
+        }
+
+        // Create Battle
+        window.createBattle = function() {
+            const team1Name = document.getElementById('team1Name').value;
+            const team2Name = document.getElementById('team2Name').value;
+
+            if (!team1Name || !team2Name) {
+                alert("Please enter both team names!");
+                return;
+            }
+
+            const userId = localStorage.getItem("userId");
+            const newBattleRef = push(ref(database, 'battles'));
+            
+            set(newBattleRef, {
+                team1: team1Name,
+                team2: team2Name,
+                score1: 0,
+                score2: 0,
+                createdBy: userId,
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                alert("Battle Created Successfully!");
+                closeModal();
+                document.getElementById('team1Name').value = '';
+                document.getElementById('team2Name').value = '';
+                loadBattles();
+            }).catch((error) => {
+                alert("Error: " + error.message);
+            });
+        }
+
+        // Load Battles
+        function loadBattles() {
+            const battlesRef = ref(database, 'battles');
+            const battleCards = document.getElementById('battleCards');
+
+            onValue(battlesRef, (snapshot) => {
+                battleCards.innerHTML = '';                
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const battle = childSnapshot.val();
+                        const card = document.createElement('div');
+                        card.className = 'battle-card';
+                        
+                        card.innerHTML = `
+                            <div class="team-info">
+                                <div class="team-avatar">${battle.team1.charAt(0).toUpperCase()}</div>
+                                <div class="team-name">${battle.team1}</div>
+                            </div>
+                            <div class="battle-score">${battle.score1} - ${battle.score2}</div>
+                            <div class="team-info">
+                                <div class="team-name">${battle.team2}</div>
+                                <div class="team-avatar">${battle.team2.charAt(0).toUpperCase()}</div>
+                            </div>
+                        `;
+                        
+                        battleCards.appendChild(card);
+                    });
+                } else {
+                    battleCards.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No active battles yet</p>';
+                }
+            });
+        }
+
+        // Navigation Function
+        window.navigate = function(page) {
+            window.location.href = page;
+        }
+
+        // Initialize
+        loadBattles();
+
+        // Close modal when clicking outside
+        document.getElementById('battleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

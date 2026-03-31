@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - FF Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #000000;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #262626;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .back-btn:hover {
+            color: #667eea;
+        }
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            background: #262626;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 45px 12px 45px;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus {
+            background: #363636;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .search-bar::placeholder {
+            color: #8e8e8e;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8e8e8e;
+            font-size: 16px;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8e8e8e;
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+        }
+
+        .clear-btn:hover {
+            color: #ffffff;
+        }
+        .results-container {
+            padding: 10px;
+        }
+
+        .result-card {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .result-card:hover {
+            background: #262626;
+        }
+
+        .result-card:active {
+            background: #363636;
+        }
+
+        .result-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #262626;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            overflow: hidden;
+            border: 2px solid #667eea;
+            flex-shrink: 0;
+        }
+
+        .result-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-avatar .default-icon {
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .result-info {            flex: 1;
+            overflow: hidden;
+        }
+
+        .result-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-nickname {
+            font-size: 14px;
+            color: #8e8e8e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-fans {
+            font-size: 13px;
+            color: #667eea;
+            margin-top: 3px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e8e;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #363636;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #667eea;
+        }
+        .loading-state i {
+            font-size: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #121212;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #262626;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            color: #8e8e8e;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="search-container">            <i class="fas fa-search search-icon"></i>
+            <input 
+                type="text" 
+                class="search-bar" 
+                id="searchInput" 
+                placeholder="Search for YouTuber tournaments"
+                autocomplete="off"
+            >
+            <i class="fas fa-times clear-btn" id="clearBtn" onclick="clearSearch()"></i>
+        </div>
+    </div>
+
+    <!-- Search Results Container -->
+    <div class="results-container" id="resultsContainer">
+        <!-- Results will be displayed here dynamically -->
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="navigate('home.html')">
+            <i class="fas fa-home"></i>
+        </div>
+        <div class="nav-item active" onclick="navigate('search.html')">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('battle.html')">
+            <i class="fas fa-crosshairs"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('messageupdate.html')">
+            <i class="fas fa-scroll"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('helptt.html')">
+            <i class="fas fa-user"></i>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1tXvanDZ-NsMksSgYemHbXALeckncA3M",
+            authDomain: "ff-player-99533.firebaseapp.com",
+            databaseURL: "https://ff-player-99533-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-player-99533",
+            storageBucket: "ff-player-99533.firebasestorage.app",
+            messagingSenderId: "204761167233",            appId: "1:204761167233:web:bd33032ce7d56b4e7fe480"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        console.log("✅ Firebase Initialized for Search Page");
+
+        // Authentication Check
+        let currentUser = null;
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                console.log("✅ User logged in:", user.uid);
+            } else {
+                console.log("❌ Not logged in - Redirecting to login");
+                alert("Please login to search users!");
+                window.location.href = "login.html";
+            }
+        });
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        // Search Functionality with Debounce
+        let searchTimeout = null;
+
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+            
+            if (query.length > 0) {
+                clearBtn.style.display = 'block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (query.length > 0) {
+                    searchUsers(query);
+                } else {
+                    resultsContainer.innerHTML = '';
+                }
+            }, 300);
+        });
+        // Search Users in Firebase
+        function searchUsers(query) {
+            if (!currentUser) {
+                alert("Please login first!");
+                window.location.href = "login.html";
+                return;
+            }
+
+            resultsContainer.innerHTML = `
+                <div class="loading-state">
+                    <i class="fas fa-spinner"></i>
+                    <p>Searching...</p>
+                </div>
+            `;
+
+            const usersRef = database.ref('users');
+            
+            usersRef.once('value')
+                .then((snapshot) => {
+                    const results = [];
+                    const searchQuery = query.toLowerCase().trim();
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const userData = childSnapshot.val();
+                        const profile = userData.profile;
+                        const userId = childSnapshot.key;
+
+                        if (!profile) return;
+
+                        const eSportName = (profile.eSportName || '').toLowerCase();
+                        const nickname = (profile.nickname || '').toLowerCase();
+
+                        // Smart Search: Case-insensitive + Partial match + Space removal
+                        const isMatch = 
+                            eSportName.includes(searchQuery) || 
+                            nickname.includes(searchQuery) ||
+                            eSportName.replace(/\s+/g, '').includes(searchQuery.replace(/\s+/g, '')) ||
+                            nickname.replace(/\s+/g, '').includes(searchQuery.replace(/\s+/g, ''));
+
+                        if (isMatch) {
+                            results.push({
+                                userId: userId,
+                                eSportName: profile.eSportName || 'Unknown',
+                                nickname: profile.nickname || '',
+                                photoURL: profile.photoURL || '',
+                                fans: profile.followers || 0
+                            });
+                        }
+                    });
+                    // Sort: Exact match first, then alphabetical
+                    results.sort((a, b) => {
+                        const aName = a.eSportName.toLowerCase();
+                        const bName = b.eSportName.toLowerCase();
+                        const aNick = a.nickname.toLowerCase();
+                        const bNick = b.nickname.toLowerCase();
+                        
+                        if (aName === searchQuery || aNick === searchQuery) return -1;
+                        if (bName === searchQuery || bNick === searchQuery) return 1;
+                        
+                        return aName.localeCompare(bName);
+                    });
+
+                    if (results.length > 0) {
+                        displayResults(results);
+                    } else {
+                        showEmptyState();
+                    }
+                })
+                .catch((error) => {
+                    console.error("❌ Search Error:", error);
+                    resultsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error searching users</p>
+                            <p style="font-size: 12px; margin-top: 10px; color: #666;">
+                                ${error.message}
+                            </p>
+                        </div>
+                    `;
+                });
+        }
+
+        // Display Search Results
+        function displayResults(results) {
+            resultsContainer.innerHTML = '';
+
+            results.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.onclick = () => openProfile(user.userId);
+
+                let avatarHTML = '';
+                if (user.photoURL && user.photoURL !== '') {
+                    avatarHTML = `<img src="${user.photoURL}" alt="${user.eSportName}" onerror="this.parentElement.innerHTML='<span class=\\'default-icon\\'>${user.eSportName.charAt(0).toUpperCase()}</span>'">`;
+                } else {
+                    const firstLetter = user.eSportName.charAt(0).toUpperCase();
+                    avatarHTML = `<span class="default-icon">${firstLetter}</span>`;
+                }
+                card.innerHTML = `
+                    <div class="result-avatar">
+                        ${avatarHTML}
+                    </div>
+                    <div class="result-info">
+                        <div class="result-name">
+                            ${escapeHtml(user.eSportName)}
+                        </div>
+                        <div class="result-nickname">
+                            ${escapeHtml(user.nickname)}
+                        </div>
+                        <div class="result-fans">
+                            ${user.fans} Fans
+                        </div>
+                    </div>
+                `;
+
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // Show Empty State
+        function showEmptyState() {
+            resultsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>No users found</p>
+                    <p style="font-size: 14px; margin-top: 10px; color: #666;">
+                        Try searching for E-sport name or nickname
+                    </p>
+                </div>
+            `;
+        }
+
+        // Clear Search
+        function clearSearch() {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            resultsContainer.innerHTML = '';
+            searchInput.focus();
+        }
+
+        // Open User Profile
+        function openProfile(userId) {
+            window.location.href = `profile.html?uid=${userId}`;
+        }
+
+        // Go Back
+        function goBack() {            window.history.back();
+        }
+
+        // Navigation
+        function navigate(page) {
+            if (page === 'search.html') return;
+            window.location.href = page;
+        }
+
+        // Escape HTML (Security)
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto Focus on Search Bar
+        window.addEventListener('load', () => {
+            searchInput.focus();
+        });
+
+        console.log("✅ Search Page Loaded");
+    </script>
+</body>
+</html>

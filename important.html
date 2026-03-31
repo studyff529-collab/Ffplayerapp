@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Important Message - FF Player</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            color: #ffffff;
+        }
+
+        /* Header */
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 20px; 
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .back-btn { 
+            position: absolute; 
+            left: 20px; 
+            top: 50%; 
+            transform: translateY(-50%);
+            font-size: 24px; 
+            cursor: pointer; 
+            color: white;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+                .header-title { 
+            font-size: 24px; 
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(102,126,234,0.1);
+            border-radius: 10px;
+        }
+
+        /* Input Section */
+        .input-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            padding: 15px 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+        }
+
+        .input-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #1a1a2e;
+            border: 2px solid #3d3d5c;
+            border-radius: 25px;
+            padding: 10px 15px;
+        }
+
+        .input-box:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102,126,234,0.3);
+        }
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 15px;
+            padding: 8px;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: #666;
+        }
+
+        .action-icon {
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .emoji-icon {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .attach-icon {
+            color: #667eea;
+        }
+
+        .attach-icon:hover {
+            transform: rotate(15deg);
+            color: #764ba2;
+        }
+
+        .send-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.4;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        .send-icon.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .send-icon.active:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(76,175,80,0.4);
+        }
+
+        /* Photo Preview */
+        .photo-preview-container {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #1a1a2e;
+            overflow-x: auto;
+            display: none;
+        }
+
+        .photo-preview-container.show {
+            display: flex;
+        }
+
+        .photo-preview {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #667eea;
+            flex-shrink: 0;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-photo {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Success Overlay */
+        .success-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.85); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .success-overlay.show { 
+            display: flex; 
+        }
+        
+        .success-box { 
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%); 
+            padding: 50px; 
+            border-radius: 25px; 
+            text-align: center;
+            animation: slideIn 0.3s ease;
+            border: 2px solid #4CAF50;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .success-icon { 
+            width: 90px; 
+            height: 90px; 
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto 25px; 
+            color: white;             font-size: 50px;
+        }
+        
+        .success-text { 
+            color: #ffffff; 
+            font-size: 24px; 
+            font-weight: 700;
+        }
+
+        #photoInput { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn" onclick="window.history.back()">←</button>
+        <div class="header-title">Important Message</div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <div class="info-text">
+            📩 Send your important message here.<br>
+            It will be saved and can be viewed later.
+        </div>
+    </div>
+
+    <!-- Photo Preview -->
+    <div class="photo-preview-container" id="photoPreviewContainer"></div>
+
+    <!-- Input Section -->
+    <div class="input-section">
+        <div class="input-box">
+            <span class="action-icon emoji-icon">😊</span>
+            <input 
+                type="text" 
+                class="chat-input" 
+                id="messageInput" 
+                placeholder="Type your message here"
+                oninput="checkInput()"
+            >
+            <span class="action-icon attach-icon" onclick="selectPhoto()">📎</span>
+            <div class="send-icon" id="sendBtn" onclick="sendMessage()">➤</div>
+        </div>
+    </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoSelect(event)">
+
+    <!-- Success Overlay -->    <div class="success-overlay" id="successOverlay">
+        <div class="success-box">
+            <div class="success-icon">✓</div>
+            <div class="success-text">Successfully</div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPhotos = [];
+        const MAX_PHOTOS = 3;
+
+        function selectPhoto() {
+            if (selectedPhotos.length >= MAX_PHOTOS) {
+                alert('You can only select up to 3 photos');
+                return;
+            }
+            document.getElementById('photoInput').click();
+        }
+
+        function handlePhotoSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (selectedPhotos.length < MAX_PHOTOS) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        selectedPhotos.push({
+                            file: file,
+                            preview: e.target.result
+                        });
+                        updatePhotoPreview();
+                        checkInput();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function updatePhotoPreview() {
+            const container = document.getElementById('photoPreviewContainer');
+            container.innerHTML = '';
+            
+            selectedPhotos.forEach((photo, index) => {
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'photo-preview';
+                previewDiv.innerHTML = `
+                    <img src="${photo.preview}" alt="Selected photo">
+                    <button class="remove-photo" onclick="removePhoto(${index})">×</button>
+                `;
+                container.appendChild(previewDiv);            });
+            
+            if (selectedPhotos.length > 0) {
+                container.classList.add('show');
+            } else {
+                container.classList.remove('show');
+            }
+        }
+
+        function removePhoto(index) {
+            selectedPhotos.splice(index, 1);
+            updatePhotoPreview();
+            checkInput();
+        }
+
+        function checkInput() {
+            const message = document.getElementById('messageInput').value.trim();
+            const sendBtn = document.getElementById('sendBtn');
+            
+            if (message.length > 0 || selectedPhotos.length > 0) {
+                sendBtn.classList.add('active');
+            } else {
+                sendBtn.classList.remove('active');
+            }
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('messageInput').value.trim();
+            
+            if (message.length === 0 && selectedPhotos.length === 0) {
+                return;
+            }
+
+            // Compress images
+            const compressedPhotos = [];
+            for (let i = 0; i < selectedPhotos.length; i++) {
+                const compressed = await compressImage(selectedPhotos[i].preview);
+                compressedPhotos.push(compressed);
+            }
+
+            // Create message object
+            const messageData = {
+                id: Date.now(),
+                text: message,
+                photos: compressedPhotos,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save to localStorage
+            let messages = JSON.parse(localStorage.getItem('importantMessages') || '[]');            messages.unshift(messageData);
+            localStorage.setItem('importantMessages', JSON.stringify(messages));
+
+            // Show success
+            document.getElementById('successOverlay').classList.add('show');
+
+            // Reset and redirect after 2 seconds
+            setTimeout(() => {
+                document.getElementById('successOverlay').classList.remove('show');
+                document.getElementById('messageInput').value = '';
+                selectedPhotos = [];
+                updatePhotoPreview();
+                checkInput();
+                
+                // Redirect to view messages page
+                window.location.href = 'importantmessages.html';
+            }, 2000);
+        }
+
+        function compressImage(base64) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = base64;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    let width = img.width;
+                    let height = img.height;
+                    const maxSize = 400;
+                    
+                    if (width > height) {
+                        if (width > maxSize) {
+                            height = (height * maxSize) / width;
+                            width = maxSize;
+                        }
+                    } else {
+                        if (height > maxSize) {
+                            width = (width * maxSize) / height;
+                            height = maxSize;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+            });        }
+    </script>
+</body>
+</html>

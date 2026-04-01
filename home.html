@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-sport - FF Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: white;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #667eea;            font-size: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255,255,255,0.8);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .app-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-icons i {
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .header-icons i:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* ========================================
+           🔥 INSTAGRAM-STYLE STORIES SECTION
+           ======================================== */
+        .stories-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 0;
+            margin-bottom: 20px;            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .stories-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 15px;
+        }
+
+        .stories-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .refresh-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(180deg);
+        }
+
+        .refresh-btn.spinning i {
+            animation: spin 0.8s ease;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .stories-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 0 20px 15px;            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            scroll-behavior: smooth;
+        }
+
+        .stories-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .story-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        .story-item:hover {
+            transform: scale(1.05);
+        }
+
+        .story-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b, #ff6b6b, #667eea);
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .story-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #1a1a2e;
+        }
+
+        .story-name {
+            font-size: 12px;
+            color: #fff;
+            text-align: center;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;        }
+
+        /* Main Content */
+        .content {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+
+        .game-card:hover {
+            transform: scale(1.05);
+        }
+
+        .game-card img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        .game-card .game-name {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .game-card.coming-soon {
+            background: #2a2a4a;
+            border: 1px solid #3a3a5a;
+        }
+
+        .game-card.coming-soon .game-name {
+            color: #fbbc05;
+            font-size: 12px;
+        }
+
+        .game-card.coming-soon img {
+            opacity: 0.3;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #16213e;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #333;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            color: #888;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+        .nav-item:hover {
+            color: #fff;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+        }
+
+        /* Login Prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+        }
+
+        .login-prompt button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Bell Icon Highlight */
+        .bell-wrapper:hover #bellIcon {
+            background: rgba(255,255,255,0.4) !important;
+            transform: scale(1.1);
+        }
+
+        .bell-wrapper.has-notification #bellIcon {
+            background: rgba(255, 71, 87, 0.3) !important;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.9); }
+        }
+
+        #notificationDot {
+            box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+            animation: blink 0.8s infinite, pulse 2s infinite;        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        /* Empty State for Stories */
+        .stories-empty {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar" onclick="goToProfile()">
+                <span id="userInitial">H</span>
+                <img id="userImage" src="" alt="User" style="display: none;">
+            </div>
+            <div class="app-name">E-sport</div>
+             </div>
+             <div class="header-icons">
+             <i class="fas fa-search" onclick="navigate('search.html')"></i>
+                </div>
+            
+            <!-- Bell Icon with Red Dot -->
+            <div class="bell-wrapper" onclick="window.location.href='notificationss.html'" style="position: relative; cursor: pointer;">
+                <i class="fas fa-bell" id="bellIcon" style="font-size: 18px; color: white; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 8px; transition: all 0.3s;"></i>
+                <!-- Red Blinking Dot -->
+                <span id="notificationDot" style="position: absolute; top: 3px; right: 3px; width: 10px; height: 10px; background: #ff4757; border-radius: 50%; border: 2px solid #1a1a2e; display: none; animation: blink 0.8s infinite;"></span>
+            </div>
+            
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
+    </div>
+
+    <!-- ========================================
+         🔥 INSTAGRAM-STYLE STORIES SECTION
+         ======================================== -->
+    <div class="stories-container" id="storiesContainer" style="display: none;">
+        <div class="stories-header">
+            <h3 class="stories-title">Active Players</h3>
+            <button class="refresh-btn" id="refreshBtn" onclick="refreshStories()">
+                <i class="fas fa-sync-alt"></i>            </button>
+        </div>
+        <div class="stories-scroll" id="storiesScroll">
+            <!-- Stories will be loaded here dynamically -->
+        </div>
+        <div class="stories-empty" id="storiesEmpty" style="display: none;">
+            No other players found
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h2 class="section-title">Choose your game</h2>
+        
+        <div class="loader" id="loader">Loading games...</div>
+        
+        <div class="login-prompt" id="loginPrompt" style="display: none;">
+            <i class="fas fa-user-lock" style="font-size: 50px; margin-bottom: 15px;"></i>
+            <p>Please login to continue</p>
+            <button onclick="window.location.href='login.html'">Login Now</button>
+        </div>
+        
+        <div class="games-grid" id="gamesGrid">
+            <!-- Games will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="navigate('home.html')">
+            <i class="fas fa-home"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('search.html')">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('battle.html')">
+            <i class="fas fa-crosshairs"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('messageupdate.html')">
+            <i class="fas fa-scroll"></i>
+        </div>
+        <div class="nav-item" onclick="navigate('helptt.html')">
+            <i class="fas fa-user"></i>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1tXvanDZ-NsMksSgYemHbXALeckncA3M",
+            authDomain: "ff-player-99533.firebaseapp.com",
+            databaseURL: "https://ff-player-99533-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ff-player-99533",
+            storageBucket: "ff-player-99533.firebasestorage.app",
+            messagingSenderId: "204761167233",
+            appId: "1:204761167233:web:bd33032ce7d56b4e7fe480"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        console.log("✅ Firebase Initialized for Home Page");
+        let currentUser = null;
+        let allUsers = []; // Store all users for random selection
+
+        // Check Auth State
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                console.log("✅ User logged in:", user.uid);
+                loadUserProfile(user.uid);
+                loadGames();
+                loadAllUsers(); // Load all users for stories
+            } else {
+                console.log("❌ No user logged in");
+                document.getElementById('loginPrompt').style.display = 'block';
+                document.getElementById('gamesGrid').style.display = 'none';
+                document.getElementById('storiesContainer').style.display = 'none';
+            }
+        });
+
+        // ========================================
+        // 🔥 LOAD ALL USERS (For Stories)
+        // ========================================
+        function loadAllUsers() {
+            console.log("🔄 Loading all users for stories...");
+            
+            database.ref('users').once('value')
+                .then((snapshot) => {
+                    allUsers = [];
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const userData = childSnapshot.val();
+                        const userId = childSnapshot.key;                        
+                        // Skip current user
+                        if (userId === currentUser.uid) return;
+                        
+                        if (userData.profile) {
+                            allUsers.push({
+                                userId: userId,
+                                ...userData.profile
+                            });
+                        }
+                    });
+                    
+                    console.log(`📊 Total users loaded: ${allUsers.length}`);
+                    
+                    if (allUsers.length > 0) {
+                        document.getElementById('storiesContainer').style.display = 'block';
+                        showRandomStories();
+                    } else {
+                        document.getElementById('storiesContainer').style.display = 'block';
+                        document.getElementById('storiesScroll').innerHTML = '';
+                        document.getElementById('storiesEmpty').style.display = 'block';
+                    }
+                })
+                .catch((error) => {
+                    console.error("❌ Error loading users:", error);
+                });
+        }
+
+        // ========================================
+        // 🔥 SHOW RANDOM STORIES
+        // ========================================
+        function showRandomStories() {
+            const storiesScroll = document.getElementById('storiesScroll');
+            const storiesEmpty = document.getElementById('storiesEmpty');
+            
+            if (allUsers.length === 0) {
+                storiesScroll.innerHTML = '';
+                storiesEmpty.style.display = 'block';
+                return;
+            }
+            
+            storiesEmpty.style.display = 'none';
+            storiesScroll.innerHTML = '';
+            
+            // Shuffle and pick random users (max 10)
+            const shuffled = [...allUsers].sort(() => 0.5 - Math.random());
+            const selectedUsers = shuffled.slice(0, Math.min(10, allUsers.length));
+            
+            console.log(`🎲 Showing ${selectedUsers.length} random users`);
+                        selectedUsers.forEach(user => {
+                const storyItem = document.createElement('div');
+                storyItem.className = 'story-item';
+                storyItem.onclick = () => openUserProfile(user.userId);
+                
+                let avatarHTML = '';
+                if (user.photoURL && user.photoURL !== '') {
+                    avatarHTML = `<img src="${user.photoURL}" alt="${user.eSportName}" onerror="this.src='https://via.placeholder.com/70/667eea/ffffff?text=${user.eSportName.charAt(0).toUpperCase()}'">`;
+                } else {
+                    const firstLetter = user.eSportName ? user.eSportName.charAt(0).toUpperCase() : 'U';
+                    avatarHTML = `<div style="width: 100%; height: 100%; border-radius: 50%; background: #667eea; display: flex; justify-content: center; align-items: center; border: 3px solid #1a1a2e; color: white; font-weight: bold; font-size: 24px;">${firstLetter}</div>`;
+                }
+                
+                storyItem.innerHTML = `
+                    <div class="story-avatar">
+                        ${avatarHTML}
+                    </div>
+                    <div class="story-name">${user.eSportName || 'Unknown'}</div>
+                `;
+                
+                storiesScroll.appendChild(storyItem);
+            });
+        }
+
+        // ========================================
+        // 🔥 REFRESH STORIES
+        // ========================================
+        function refreshStories() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            // Add spinning animation
+            refreshBtn.classList.add('spinning');
+            
+            // Reload users and show new random selection
+            setTimeout(() => {
+                loadAllUsers();
+                refreshBtn.classList.remove('spinning');
+            }, 800);
+        }
+
+        // ========================================
+        // OPEN USER PROFILE
+        // ========================================
+        function openUserProfile(userId) {
+            console.log("🔗 Opening profile:", userId);
+            window.location.href = `profile.html?uid=${userId}`;
+        }
+
+        // --- 🎮 DYNAMIC GAMES CONFIGURATION ---
+        const gamesConfig = [            {
+                name: "Free Fire",
+                image: "https://wallpaperaccess.com/full/234596.jpg",
+                link: "gaming.html"
+            },
+            {
+                name: "BGMI",
+                image: "https://wallpaperaccess.com/full/1234567.jpg",
+                link: "bgmi.html"
+            },
+            {
+                name: "Mini Militia",
+                image: "https://wallpaperaccess.com/full/1234577.jpg",
+                link: "minimilitia.html"
+            },
+            {
+                name: "Coming Soon",
+                image: "",
+                link: "#",
+                comingSoon: true
+            },
+            {
+                name: "Coming Soon",
+                image: "",
+                link: "#",
+                comingSoon: true
+            },
+            {
+                name: "Coming Soon",
+                image: "",
+                link: "#",
+                comingSoon: true
+            }
+        ];
+
+        // Load User Profile Data (Top Circle)
+        function loadUserProfile(userId) {
+            const profileRef = database.ref('users/' + userId + '/profile');
+            
+            profileRef.once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        const userInitial = document.getElementById('userInitial');
+                        const userImage = document.getElementById('userImage');
+
+                        if (data.photoURL && data.photoURL !== "") {
+                            userImage.src = data.photoURL;
+                            userImage.style.display = 'block';
+                            userInitial.style.display = 'none';                            console.log("✅ Profile photo loaded:", data.photoURL);
+                        } else {
+                            const firstLetter = data.eSportName ? data.eSportName.charAt(0).toUpperCase() : 'U';
+                            userInitial.textContent = firstLetter;
+                            userImage.style.display = 'none';
+                            userInitial.style.display = 'flex';
+                        }
+                    } else {
+                        const name = localStorage.getItem("userName") || "U";
+                        document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+                    }
+                })
+                .catch((error) => {
+                    console.error("❌ Error loading profile:", error);
+                });
+        }
+
+        // Render Games
+        function loadGames() {
+            const gamesGrid = document.getElementById('gamesGrid');
+            const loader = document.getElementById('loader');
+            
+            loader.style.display = 'none';
+            gamesGrid.innerHTML = '';
+
+            gamesConfig.forEach(game => {
+                const card = document.createElement('div');
+                card.className = `game-card ${game.comingSoon ? 'coming-soon' : ''}`;
+                
+                if (!game.comingSoon) {
+                    card.onclick = () => {
+                        window.location.href = game.link;
+                    };
+                    card.style.cursor = 'pointer';
+                } else {
+                    card.onclick = () => {
+                        alert(game.name + " - Coming Soon!");
+                    };
+                }
+
+                let imageHtml = '';
+                if (game.comingSoon) {
+                    imageHtml = `<i class="fas fa-gamepad" style="font-size: 40px; color: #667eea; margin-bottom: 10px;"></i>`;
+                } else {
+                    imageHtml = `<img src="${game.image}" alt="${game.name}" onerror="this.src='https://via.placeholder.com/150'">`;
+                }
+
+                card.innerHTML = `
+                    ${imageHtml}
+                    <div class="game-name">${game.name}</div>                `;
+
+                gamesGrid.appendChild(card);
+            });
+        }
+
+        // Navigation Function
+        function navigate(page) {
+            if (page === 'home.html') return;
+            window.location.href = page;
+        }
+
+        // Go to Profile
+        function goToProfile() {
+            if (currentUser) {
+                window.location.href = "profile.html";
+            } else {
+                alert("Please login first!");
+                window.location.href = "login.html";
+            }
+        }
+
+        console.log("✅ Home Page Loaded");
+
+        // 🔔 Check Notifications from localStorage
+        function checkNotificationDot() {
+            const bellWrapper = document.querySelector('.bell-wrapper');
+            const bellIcon = document.getElementById('bellIcon');
+            const notificationDot = document.getElementById('notificationDot');
+            
+            if (!notificationDot) return;
+            
+            const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+            const now = Date.now();
+            
+            const activeNotifications = notifications.filter(notif => notif.expiresAt > now);
+            
+            if (activeNotifications.length > 0) {
+                notificationDot.style.display = 'block';
+                bellWrapper.classList.add('has-notification');
+                bellIcon.style.boxShadow = '0 0 15px rgba(255, 71, 87, 0.5)';
+            } else {
+                notificationDot.style.display = 'none';
+                bellWrapper.classList.remove('has-notification');
+                bellIcon.style.boxShadow = 'none';
+            }
+        }
+
+        setInterval(checkNotificationDot, 2000);
+        window.addEventListener('load', checkNotificationDot);        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                checkNotificationDot();
+            }
+        });
+    </script>
+</body>
+</html>
